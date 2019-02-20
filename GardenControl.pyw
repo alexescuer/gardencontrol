@@ -1,3 +1,4 @@
+# Import libraries
 import time
 import datetime
 import requests
@@ -137,7 +138,7 @@ class myGUI(tk.Frame):
         text_handler = TextHandler(st)
 
         # Log file configuration. Here we define the file we will store the log
-        logging.basicConfig(filename='log_test_file.log',
+        logging.basicConfig(filename='log_file.log',
             level=logging.INFO, 
             format='%(asctime)s - %(levelname)s - %(message)s')        
 
