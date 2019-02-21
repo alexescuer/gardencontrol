@@ -1,4 +1,3 @@
-# Import libraries
 import time
 import datetime
 import requests
@@ -11,6 +10,8 @@ try:
 except ImportError:
     import Tkinter as tk # Python 2.x
     import ScrolledText
+
+
 
 class TextHandler(logging.Handler):
         # This class allows you to log to a Tkinter Text or ScrolledText widget
