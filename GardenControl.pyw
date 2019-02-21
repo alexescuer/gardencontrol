@@ -279,13 +279,13 @@ def WorkerLigths():
         FirstTask = Sleeping.FixedSleep(hours,minutes)
 
         #Lights On please!
-        SecondTask = GpioAction.LightsOn()
+        SecondTask = GpioAction.LigthsOn()
 
         # now we will wait until the time to switch off the ligths at 23 pm
         ThirdTask = Sleeping.FixedSleep(23,00)
 
         #Lights Off please!
-        SecondTask = GpioAction.LightsOff()
+        FourthTask = GpioAction.LightsOff()
 
 
 def WorkerApiSunset():
