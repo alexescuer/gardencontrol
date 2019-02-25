@@ -228,14 +228,16 @@ class API():
             hoursint = int(hours) + 12
             # we make sure minutes are also an int
             minutesint = int(minutes)
-
             # we log this info
             timeStr = time.asctime()
             msg = timeStr + ' - API Conected successfully. Sunset: ' + sunset
             logging.info(msg)
-
+            # we fill the global variable
             global SunsetTime
             SunsetTime = (hoursint, minutesint)
+            # just to make sure the task will not run again
+            time.sleep(60)
+            
 # Now we define the three diferent threads that we will use.
 # One is for the water, another for the lights, and a last one for acquiring the sunset time.
 
@@ -284,7 +286,7 @@ def WorkerLigths():
         ThirdTask = Sleeping.FixedSleep(23,00)
 
         #Lights Off please!
-        FourthTask = GpioAction.LightsOff()
+        FourthTask = GpioAction.LigthsOff()
 
 
 def WorkerApiSunset():
@@ -292,10 +294,11 @@ def WorkerApiSunset():
     # Invoque global variable
     global SunsetTime
     while True:
-        # Exectute daily at 2.00
-        FirstTask = Sleeping.FixedSleep(2,0)
         # Request API amd fill global variable
         SunsetTime = API.Conection()
+        # Exectute daily at 2.00
+        FirstTask = Sleeping.FixedSleep(2,0)
+
       
 
 def main():
