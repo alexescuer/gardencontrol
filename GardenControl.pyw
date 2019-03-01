@@ -234,22 +234,25 @@ class API():
             logging.info(msg)
             # we fill the global variable
             global SunsetTime
-            SunsetTime = (hoursint, minutesint)
+            SunsetTime = [hoursint, minutesint]
             # just to make sure the task will not run again
             time.sleep(60)
+
             
 # Now we define the three diferent threads that we will use.
 # One is for the water, another for the lights, and a last one for acquiring the sunset time.
 
 def WorkerWater():
-        # This is the thread that will take care of the water
-        # We request de global variable that stores the data input from user. Default will be 2 days
-    global WaterDays
-        # We request also the global variable with the sunset time because we will water on sunset
-    global SunsetTime
-    
+    # This is the thread that will take care of the water
+    # On start up we need to wait 10 seconds until the API has obtained the
+    # sunset value. This way we make sure the first run is done at the correct time
+    time.sleep(10)    
     while True:
         # here we will loop the open water and close water tasks.
+        # We request de global variable that stores the data input from user. Default will be 2 days
+        global WaterDays
+        # We request also the global variable with the sunset time because we will water on sunset
+        global SunsetTime
         # This is the "adjustment" sleep.
         # we use this to be sure that we will always open water at sunset
         # lets request to the API the sunset time
@@ -268,11 +271,13 @@ def WorkerWater():
         
         
 def WorkerLigths():
-        # This is the thread for the lights
-        # We request the sunset time via the global variable
-    global SunsetTime
-    
+    # This is the thread for the lights
+    # On start up we need to wait 10 seconds until the API has obtained the
+    # sunset value. This way we make sure the first run is done at the correct time
+    time.sleep(10)
     while True:
+        # We request the sunset time via the global variable
+        global SunsetTime
         # we will sleep until the time to switch on the ligths
         # lets call the global variable with the sunset time
         hours = SunsetTime[0]
