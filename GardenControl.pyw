@@ -280,8 +280,11 @@ def WorkerLigths():
         global SunsetTime
         # we will sleep until the time to switch on the ligths
         # lets call the global variable with the sunset time
-        hours = SunsetTime[0]
-        minutes = SunsetTime[1]
+        print (SunsetTime)
+        hours = (SunsetTime[0])
+        minutes = (SunsetTime[1])
+        print(hours)
+        print(minutes)
         FirstTask = Sleeping.FixedSleep(hours,minutes)
 
         #Lights On please!
