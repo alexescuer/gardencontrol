@@ -4,14 +4,13 @@ import requests
 import json
 import threading
 import logging
+#import RPi.GPIO as GPIO
 try:
     import tkinter as tk # Python 3.x
     import tkinter.scrolledtext as ScrolledText
 except ImportError:
     import Tkinter as tk # Python 2.x
     import ScrolledText
-
-
 
 class TextHandler(logging.Handler):
         # This class allows you to log to a Tkinter Text or ScrolledText widget
@@ -151,28 +150,54 @@ class GpioAction():
             self.time = time
 
         def OpenWater():
-            #time ending is current time plus 30 times 60 seconds
-            #time_end = time.time() + 60 * 30
-            # perform action while current time is smaller than ending time
+            # Maybe it is not the most ortodox way to control GPIO but is rock solid
+            # First we define that GPIO will be using BOARD pin numbers
+            GPIO.setmode(GPIO.BOARD)
+            # We declare the pin we will use as an output --> 11
+            GPIO.setup(11,GPIO.OUT)
+            # Turn relay ON
+            GPIO.output(11, GPIO.HIGH)
+           
             #log
             timeStr = time.asctime()
             msg = timeStr + ' - Open water'
-            logging.info(msg) 
-            #while time.time() < time_end:
-            time.sleep(30)
-            #we open the water
+            logging.info(msg)
+            
+            # We will water for 30 min every time 60*30=1800 seconds
+            time.sleep(1800)
+            
+            # Turn relay OFF
+            GPIO.output(7, GPIO.LOW)
+            # Lets clean the output used so no voltage is transmited
+            # Not sure why but this was the only method to 100% turn off the relay
+            GPIO.cleanup(7)
+            
             #log
             timeStr = time.asctime()
             msg = timeStr + ' - Close water'
             logging.info(msg)
             
         def LigthsOn():
+            # Maybe it is not the most ortodox way to control GPIO but is rock solid
+            # First we define that GPIO will be using BOARD pin numbers
+            GPIO.setmode(GPIO.BOARD)
+            # We declare the pin we will use as an output --> 7
+            GPIO.setup(7,GPIO.OUT)
+            # Turn relay ON
+            GPIO.output(7, GPIO.HIGH)
+          
             #log
             timeStr = time.asctime()
             msg = timeStr + ' - Ligths ON'
             logging.info(msg)
             
         def LigthsOff():
+            # Turn relay OFF
+            GPIO.output(7, GPIO.LOW)
+            # Lets clean the output used so no voltage is transmited
+            # Not sure why but this was the only method to 100% turn off the relay
+            GPIO.cleanup(7)
+
             #log
             timeStr = time.asctime()
             msg = timeStr + ' - Ligths OFF'
@@ -280,11 +305,8 @@ def WorkerLigths():
         global SunsetTime
         # we will sleep until the time to switch on the ligths
         # lets call the global variable with the sunset time
-        print (SunsetTime)
-        hours = (SunsetTime[0])
-        minutes = (SunsetTime[1])
-        print(hours)
-        print(minutes)
+        hours = SunsetTime[0]
+        minutes = SunsetTime[1]
         FirstTask = Sleeping.FixedSleep(hours,minutes)
 
         #Lights On please!
