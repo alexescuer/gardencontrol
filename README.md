@@ -6,3 +6,6 @@ This project is unfinished.
 2) More documentation on how everything is suposed to work (start up, screen, relays, solenoid valve,etc)
 
 It will be finished soon!
+
+GPIO
+http://www.geekytheory.com/wp-content/uploads/2013/04/gpio-geeky-theory-raspberry-pi.png
