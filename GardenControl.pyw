@@ -4,7 +4,7 @@ import requests
 import json
 import threading
 import logging
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 try:
     import tkinter as tk # Python 3.x
     import tkinter.scrolledtext as ScrolledText
@@ -192,6 +192,11 @@ class GpioAction():
             logging.info(msg)
             
         def LigthsOff():
+            # Maybe it is not the most ortodox way to control GPIO but is rock solid
+            # First we define that GPIO will be using BOARD pin numbers
+            GPIO.setmode(GPIO.BOARD)
+            # We declare the pin we will use as an output --> 7
+            GPIO.setup(7,GPIO.OUT)
             # Turn relay OFF
             GPIO.output(7, GPIO.LOW)
             # Lets clean the output used so no voltage is transmited
