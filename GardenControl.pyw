@@ -41,7 +41,7 @@ global WaterDays
 WaterDays = 2
 # This will store the status of the button "water now" 0 is off 1 means action
 global ButtonWaterInput
-ButtonWaterInput == 0
+ButtonWaterInput = 0
 
 class buttons():
     #This class contain the functions triggered with the menu buttons
@@ -60,7 +60,7 @@ class buttons():
             # this is used to prevent the program from freezing when the "water now" button is used
             # to avoid this we will use a diferent thread to the water now button action
             global ButtonWaterInput
-            ButtonWaterInput == 1
+            ButtonWaterInput = 1
             
     def Water2Days():
             # change the global variable with 2 days
@@ -305,7 +305,7 @@ def WorkerWater():
         # we use a diferent thread to execute the task to avoid timing problems because the 
         # water task takes 30 min each time- we are using the same thread as the water now button
         global ButtonWaterInput
-        ButtonWaterInput == 1
+        ButtonWaterInput = 1
         
         # sleep for the amount of days desired by the user
         SecondTask = Sleeping.DaysSleep(WaterDays)   
@@ -347,15 +347,16 @@ def WorkerApiSunset():
         FirstTask = Sleeping.FixedSleep(2,0)
 
 def WorkerButtonWater():
+    while True:
     global ButtonWaterInput
-    if ButtonWaterInput == 1
+    if ButtonWaterInput == 1:
         # Open water
         FirstTask = GpioAction.OpenWater()
         # We will water for 30 min every time 60*30=1800 seconds
         time.sleep(1800)
         # Closet water
         SecondTask = GpioAction.CloseWater()
-        ButtonWaterInput == 0
+        ButtonWaterInput = 0
         
       
 
@@ -383,6 +384,7 @@ def main():
     root.mainloop()
     Worker0.join()
     Worker1.join()
+    Worker2.join()
     Worker3.join()
     
     
