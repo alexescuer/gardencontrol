@@ -35,7 +35,7 @@ class TextHandler(logging.Handler):
         # This is necessary because we can't modify the Text from other threads
         self.text.after(0, append)
 
-# Here we create the global variable that will store the user input.
+# Here we create the global variables that will store the user input.
 # By default we will use the value 2 days
 global WaterDays
 WaterDays = 2
@@ -53,8 +53,10 @@ class buttons():
             lon = GpioAction.LightsOn()
 
     def WaterNow():
-            # Execute action that opens and closes water now
-            w = GpioAction.OpenWater()
+            # Execute action that opens and closes water now in a diferent thread
+            # this is used to prevent the program from freezing when the "water now" button is used
+            # to avoid this we will use a diferent thread to the water now button action
+            threading.Thread(target=WorkerButtonWater).start()
 
     def Water2Days():
             # change the global variable with 2 days
@@ -163,14 +165,17 @@ class GpioAction():
             msg = timeStr + ' - Open water'
             logging.info(msg)
             
-            # We will water for 30 min every time 60*30=1800 seconds
-            time.sleep(1800)
-            
+        def CloseWater():    
+            # Maybe it is not the most ortodox way to control GPIO but is rock solid
+            # First we define that GPIO will be using BOARD pin numbers
+            GPIO.setmode(GPIO.BOARD)
+            # We declare the pin we will use as an output --> 11
+            GPIO.setup(11,GPIO.OUT)
             # Turn relay OFF
-            GPIO.output(7, GPIO.LOW)
+            GPIO.output(11, GPIO.LOW)
             # Lets clean the output used so no voltage is transmited
             # Not sure why but this was the only method to 100% turn off the relay
-            GPIO.cleanup(7)
+            GPIO.cleanup(11)
             
             #log
             timeStr = time.asctime()
@@ -276,7 +281,10 @@ def WorkerWater():
     # This is the thread that will take care of the water
     # On start up we need to wait 10 seconds until the API has obtained the
     # sunset value. This way we make sure the first run is done at the correct time
-    time.sleep(10)    
+    time.sleep(10)
+    # During testing I found that pins remain "in use" if you stop the program and the only way to solve is this o rebooting raspberry
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.cleanup(11)    
     while True:
         # here we will loop the open water and close water tasks.
         # We request de global variable that stores the data input from user. Default will be 2 days
@@ -285,10 +293,8 @@ def WorkerWater():
         global SunsetTime
         # This is the "adjustment" sleep.
         # we use this to be sure that we will always open water at sunset
-        # lets request to the API the sunset time
-        hours = SunsetTime[0]
-        minutes = SunsetTime[1]
-        FirstTask = Sleeping.FixedSleep(hours,minutes)
+        # lets request to the API the sunset time and pass it  to the sleeping class
+        FirstTask = Sleeping.FixedSleep(SunsetTime[0],SunsetTime[1])
         
         # water please!
         SecondTask = GpioAction.OpenWater()   
@@ -305,14 +311,15 @@ def WorkerLigths():
     # On start up we need to wait 10 seconds until the API has obtained the
     # sunset value. This way we make sure the first run is done at the correct time
     time.sleep(10)
+    # During testing I found that pins remain "in use" if you stop the program and the only way to solve is this o rebooting raspberry
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.cleanup(7)
     while True:
         # We request the sunset time via the global variable
         global SunsetTime
         # we will sleep until the time to switch on the ligths
-        # lets call the global variable with the sunset time
-        hours = SunsetTime[0]
-        minutes = SunsetTime[1]
-        FirstTask = Sleeping.FixedSleep(hours,minutes)
+        # lets call the global variable with the sunset time and pass it to the sleeping class
+        FirstTask = Sleeping.FixedSleep(SunsetTime[0],SunsetTime[1])
 
         #Lights On please!
         SecondTask = GpioAction.LigthsOn()
@@ -333,6 +340,14 @@ def WorkerApiSunset():
         SunsetTime = API.Conection()
         # Exectute daily at 2.00
         FirstTask = Sleeping.FixedSleep(2,0)
+
+def WorkerButtonWater():
+    # Open water
+    FirstTask = GpioAction.OpenWater()
+    # We will water for 30 min every time 60*30=1800 seconds
+    time.sleep(1800)
+    # Closet water
+    SecondTask = GpioAction.CloseWater()
 
       
 
@@ -358,6 +373,7 @@ def main():
     Worker0.join()
     Worker1.join()
     Worker2.join()
+    
     
 #here we start the engine
 main()
