@@ -39,6 +39,9 @@ class TextHandler(logging.Handler):
 # By default we will use the value 2 days
 global WaterDays
 WaterDays = 2
+# This will store the status of the button "water now" 0 is off 1 means action
+global ButtonWaterInput
+ButtonWaterInput == 0
 
 class buttons():
     #This class contain the functions triggered with the menu buttons
@@ -56,8 +59,9 @@ class buttons():
             # Execute action that opens and closes water now in a diferent thread
             # this is used to prevent the program from freezing when the "water now" button is used
             # to avoid this we will use a diferent thread to the water now button action
-            threading.Thread(target=WorkerButtonWater).start()
-
+            global ButtonWaterInput
+            ButtonWaterInput == 1
+            
     def Water2Days():
             # change the global variable with 2 days
             global WaterDays
@@ -291,6 +295,7 @@ def WorkerWater():
         global WaterDays
         # We request also the global variable with the sunset time because we will water on sunset
         global SunsetTime
+
         # This is the "adjustment" sleep.
         # we use this to be sure that we will always open water at sunset
         # lets request to the API the sunset time and pass it  to the sleeping class
@@ -299,7 +304,8 @@ def WorkerWater():
         # water please!
         # we use a diferent thread to execute the task to avoid timing problems because the 
         # water task takes 30 min each time- we are using the same thread as the water now button
-        threading.Thread(target=WorkerButtonWater).start()
+        global ButtonWaterInput
+        ButtonWaterInput == 1
         
         # sleep for the amount of days desired by the user
         SecondTask = Sleeping.DaysSleep(WaterDays)   
@@ -341,13 +347,16 @@ def WorkerApiSunset():
         FirstTask = Sleeping.FixedSleep(2,0)
 
 def WorkerButtonWater():
-    # Open water
-    FirstTask = GpioAction.OpenWater()
-    # We will water for 30 min every time 60*30=1800 seconds
-    time.sleep(1800)
-    # Closet water
-    SecondTask = GpioAction.CloseWater()
-
+    global ButtonWaterInput
+    if ButtonWaterInput == 1
+        # Open water
+        FirstTask = GpioAction.OpenWater()
+        # We will water for 30 min every time 60*30=1800 seconds
+        time.sleep(1800)
+        # Closet water
+        SecondTask = GpioAction.CloseWater()
+        ButtonWaterInput == 0
+        
       
 
 def main():
@@ -366,12 +375,15 @@ def main():
     # water worker
     Worker2 = threading.Thread(target=WorkerWater, args=[])
     Worker2.start()
+    # water button worker
+    Worker3 = threading.Thread(target=WorkerButtonWater, args=[])
+    Worker3.start()
 
-    # put in mainloop GUI and worker thread
+    # put in mainloop GUI and worker threads
     root.mainloop()
     Worker0.join()
     Worker1.join()
-    Worker2.join()
+    Worker3.join()
     
     
 #here we start the engine
