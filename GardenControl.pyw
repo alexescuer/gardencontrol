@@ -297,13 +297,12 @@ def WorkerWater():
         FirstTask = Sleeping.FixedSleep(SunsetTime[0],SunsetTime[1])
         
         # water please!
-        SecondTask = GpioAction.OpenWater()   
+        # we use a diferent thread to execute the task to avoid timing problems because the 
+        # water task takes 30 min each time- we are using the same thread as the water now button
+        threading.Thread(target=WorkerButtonWater).start()
         
         # sleep for the amount of days desired by the user
-        ThirdTask = Sleeping.DaysSleep(WaterDays)
-        
-        # water please!
-        FourthTask = GpioAction.OpenWater()   
+        SecondTask = Sleeping.DaysSleep(WaterDays)   
         
         
 def WorkerLigths():
