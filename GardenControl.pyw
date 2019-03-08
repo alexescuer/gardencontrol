@@ -53,7 +53,7 @@ class buttons():
     def LightsOn():
             # lights on please
             # not used
-            lon = GpioAction.LightsOn()
+            lon = GpioAction.LigthsOn()
 
     def WaterNow():
             # Execute action that opens and closes water now in a diferent thread
@@ -285,10 +285,7 @@ def WorkerWater():
     # This is the thread that will take care of the water
     # On start up we need to wait 10 seconds until the API has obtained the
     # sunset value. This way we make sure the first run is done at the correct time
-    time.sleep(10)
-    # During testing I found that pins remain "in use" if you stop the program and the only way to solve is this o rebooting raspberry
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.cleanup(11)    
+    time.sleep(10) 
     while True:
         # here we will loop the open water and close water tasks.
         # We request de global variable that stores the data input from user. Default will be 2 days
@@ -316,9 +313,6 @@ def WorkerLigths():
     # On start up we need to wait 10 seconds until the API has obtained the
     # sunset value. This way we make sure the first run is done at the correct time
     time.sleep(10)
-    # During testing I found that pins remain "in use" if you stop the program and the only way to solve is this o rebooting raspberry
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.cleanup(7)
     while True:
         # We request the sunset time via the global variable
         global SunsetTime
@@ -338,9 +332,9 @@ def WorkerLigths():
 
 def WorkerApiSunset():
     # This thread will daily update de sunset time value
-    # Invoque global variable
-    global SunsetTime
     while True:
+        # Invoque global variable
+        global SunsetTime
         # Request API amd fill global variable
         SunsetTime = API.Conection()
         # Exectute daily at 2.00
