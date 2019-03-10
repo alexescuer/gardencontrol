@@ -342,7 +342,7 @@ def WorkerApiSunset():
 
 def WorkerButtonWater():
     while True:
-    global ButtonWaterInput
+        global ButtonWaterInput
     if ButtonWaterInput == 1:
         # Open water
         FirstTask = GpioAction.OpenWater()
