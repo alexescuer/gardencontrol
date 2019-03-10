@@ -1,11 +1,17 @@
 # GardenControl
 Simple water and lights control system. Written in python.
 
-This project is unfinished. 
-1) The class GpioAction needs to be correctly configured. There is no action or pins set so far.
-2) More documentation on how everything is suposed to work (start up, screen, relays, solenoid valve,etc)
+This project is now in beta. It is currently on test. If you want to use it please share your opinion. Readme file is just a sketch.
 
-It will be finished soon!
+## Hardware Required
+1) Raspberry pi
+2) Solenoid valve (closed)
+3) Two Relays
 
-GPIO
-http://www.geekytheory.com/wp-content/uploads/2013/04/gpio-geeky-theory-raspberry-pi.png
+## Installation Steps
+1) git clone  https://github.com/alexescuer/gardencontrol
+2) pip install datetime
+pip install requests
+pip install logging
+pip install GPIO
+
