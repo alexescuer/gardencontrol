@@ -59,8 +59,9 @@ class buttons():
             # Execute action that opens and closes water now in a diferent thread
             # this is used to prevent the program from freezing when the "water now" button is used
             # to avoid this we will use a diferent thread to the water now button action
-            global ButtonWaterInput
-            ButtonWaterInput = 1
+            #global ButtonWaterInput
+            #ButtonWaterInput = 1
+            wn = WorkerButtonWater()
             
     def Water2Days():
             # change the global variable with 2 days
@@ -341,16 +342,16 @@ def WorkerApiSunset():
         FirstTask = Sleeping.FixedSleep(2,0)
 
 def WorkerButtonWater():
-    while True:
-        global ButtonWaterInput
-    if ButtonWaterInput == 1:
-        # Open water
-        FirstTask = GpioAction.OpenWater()
-        # We will water for 30 min every time 60*30=1800 seconds
-        time.sleep(1800)
-        # Closet water
-        SecondTask = GpioAction.CloseWater()
-        ButtonWaterInput = 0
+    #while True:
+        #global ButtonWaterInput
+        #if ButtonWaterInput == 1:
+            # Open water
+    FirstTask = GpioAction.OpenWater()
+            # We will water for 30 min every time 60*30=1800 seconds
+    time.sleep(1800)
+            # Closet water
+    SecondTask = GpioAction.CloseWater()
+            #ButtonWaterInput = 0
         
       
 
@@ -371,15 +372,15 @@ def main():
     Worker2 = threading.Thread(target=WorkerWater, args=[])
     Worker2.start()
     # water button worker
-    Worker3 = threading.Thread(target=WorkerButtonWater, args=[])
-    Worker3.start()
+    #Worker3 = threading.Thread(target=WorkerButtonWater, args=[])
+    #Worker3.start()
 
     # put in mainloop GUI and worker threads
     root.mainloop()
     Worker0.join()
     Worker1.join()
     Worker2.join()
-    Worker3.join()
+    #Worker3.join()
     
     
 #here we start the engine
