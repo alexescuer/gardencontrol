@@ -281,7 +281,14 @@ class API():
         def Conection():
             # log in to the API. This URL icnludes latitude and longitude. please check the api for more info.
             url = 'https://api.sunrise-sunset.org/json?lat=36.7201600&lng=-4.4203400'
-            apidata = requests.get(url).json()
+            try:
+                apidata = requests.get(url).json()
+            except requests.exceptions.RequestException as error:  
+                # we log this info
+                timeStr = time.asctime()
+                msg = timeStr + ' - API Error: ' + error
+                logging.info(msg)
+
             # Take te sunset value time
             sunset = apidata['results']['sunset']
             # We clean the format with split to be able to use it for the schedule.
@@ -309,13 +316,12 @@ def WorkerWater():
     # On start up we need to wait 10 seconds until the API has obtained the
     # sunset value. This way we make sure the first run is done at the correct time
     time.sleep(10) 
+    # We request de global variable that stores the data input from user. Default will be 2 days
+    global WaterDays
+    # We request also the global variable with the sunset time because we will water on sunset
+    global SunsetTime
     while True:
         # here we will loop the open water and close water tasks.
-        # We request de global variable that stores the data input from user. Default will be 2 days
-        global WaterDays
-        # We request also the global variable with the sunset time because we will water on sunset
-        global SunsetTime
-
         # This is the "adjustment" sleep.
         # we use this to be sure that we will always open water at sunset
         # lets request to the API the sunset time and pass it  to the sleeping class
@@ -333,9 +339,10 @@ def WorkerLigths():
     # On start up we need to wait 10 seconds until the API has obtained the
     # sunset value. This way we make sure the first run is done at the correct time
     time.sleep(10)
+    # We request the sunset time via the global variable
+    global SunsetTime
     while True:
-        # We request the sunset time via the global variable
-        global SunsetTime
+
         # we will sleep until the time to switch on the ligths
         # lets call the global variable with the sunset time and pass it to the sleeping class
         FirstTask = Sleeping.FixedSleep(SunsetTime[0],SunsetTime[1])
