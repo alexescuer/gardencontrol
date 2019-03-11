@@ -56,12 +56,8 @@ class buttons():
             lon = GpioAction.LigthsOn()
 
     def WaterNow():
-            # Execute action that opens and closes water now in a diferent thread
-            # this is used to prevent the program from freezing when the "water now" button is used
-            # to avoid this we will use a diferent thread to the water now button action
-            #global ButtonWaterInput
-            #ButtonWaterInput = 1
-            wn = WorkerButtonWater()
+            # water please
+            wn = GpioAction.OpenCloseWater()
             
     def Water2Days():
             # change the global variable with 2 days
@@ -152,18 +148,20 @@ class myGUI(tk.Frame):
         logger.addHandler(text_handler)
 
 class GpioAction():
-        # here we have all gpio actions and configurations
+        # here we have all gpio actions and configurations, we define the pins used
         def __init__(self):
             self.time = time
+            self.WaterPin = 11
+            self.LightPin = 7
 
         def OpenWater():
             # Maybe it is not the most ortodox way to control GPIO but is rock solid
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
-            # We declare the pin we will use as an output --> 11
-            GPIO.setup(11,GPIO.OUT)
+            # We declare the pin we will use as an output
+            GPIO.setup(WaterPin,GPIO.OUT)
             # Turn relay ON
-            GPIO.output(11, GPIO.HIGH)
+            GPIO.output(WaterPin, GPIO.HIGH)
            
             #log
             timeStr = time.asctime()
@@ -174,27 +172,51 @@ class GpioAction():
             # Maybe it is not the most ortodox way to control GPIO but is rock solid
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
-            # We declare the pin we will use as an output --> 11
-            GPIO.setup(11,GPIO.OUT)
+            # We declare the pin we will use as an output
+            GPIO.setup(WaterPin,GPIO.OUT)
             # Turn relay OFF
-            GPIO.output(11, GPIO.LOW)
+            GPIO.output(WaterPin, GPIO.LOW)
             # Lets clean the output used so no voltage is transmited
             # Not sure why but this was the only method to 100% turn off the relay
-            GPIO.cleanup(11)
+            GPIO.cleanup(WaterPin)
             
             #log
             timeStr = time.asctime()
             msg = timeStr + ' - Close water'
             logging.info(msg)
+        
+        def OpenCloseWater():
+            # This will perform both actions open-close. We don't rehuse code becasue the closing action is not the same
+            # First we define that GPIO will be using BOARD pin numbers
+            GPIO.setmode(GPIO.BOARD)
+            # We declare the pin we will use as an output
+            GPIO.setup(WaterPin,GPIO.OUT)
+            # Turn relay ON
+            GPIO.output(WaterPin, GPIO.HIGH)
+
+            #log
+            timeStr = time.asctime()
+            msg = timeStr + ' - Open water'
+            logging.info(msg)
+
+            # we will sleep for 1800 seconds (30min) every time to water the plants
+            time.sleep(1800)
+
+            # Turn relay OFF
+            GPIO.output(WaterPin, GPIO.LOW)
+            # Lets clean the output used so no voltage is transmited
+            # Not sure why but this was the only method to 100% turn off the relay
+            GPIO.cleanup(WaterPin)
+
             
         def LigthsOn():
             # Maybe it is not the most ortodox way to control GPIO but is rock solid
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
-            # We declare the pin we will use as an output --> 7
-            GPIO.setup(7,GPIO.OUT)
+            # We declare the pin we will use as an output
+            GPIO.setup(LightPin,GPIO.OUT)
             # Turn relay ON
-            GPIO.output(7, GPIO.HIGH)
+            GPIO.output(LightPin, GPIO.HIGH)
           
             #log
             timeStr = time.asctime()
@@ -205,13 +227,13 @@ class GpioAction():
             # Maybe it is not the most ortodox way to control GPIO but is rock solid
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
-            # We declare the pin we will use as an output --> 7
-            GPIO.setup(7,GPIO.OUT)
+            # We declare the pin we will use as an output
+            GPIO.setup(LightPin,GPIO.OUT)
             # Turn relay OFF
-            GPIO.output(7, GPIO.LOW)
+            GPIO.output(LightPin, GPIO.LOW)
             # Lets clean the output used so no voltage is transmited
             # Not sure why but this was the only method to 100% turn off the relay
-            GPIO.cleanup(7)
+            GPIO.cleanup(LightPin)
 
             #log
             timeStr = time.asctime()
@@ -300,13 +322,10 @@ def WorkerWater():
         FirstTask = Sleeping.FixedSleep(SunsetTime[0],SunsetTime[1])
         
         # water please!
-        # we use a diferent thread to execute the task to avoid timing problems because the 
-        # water task takes 30 min each time- we are using the same thread as the water now button
-        global ButtonWaterInput
-        ButtonWaterInput = 1
+        SecondTask = GpioAction.OpenCloseWater()
         
         # sleep for the amount of days desired by the user
-        SecondTask = Sleeping.DaysSleep(WaterDays)   
+        ThirdTask = Sleeping.DaysSleep(WaterDays)   
         
         
 def WorkerLigths():
@@ -340,19 +359,7 @@ def WorkerApiSunset():
         SunsetTime = API.Conection()
         # Exectute daily at 2.00
         FirstTask = Sleeping.FixedSleep(2,0)
-
-def WorkerButtonWater():
-    #while True:
-        #global ButtonWaterInput
-        #if ButtonWaterInput == 1:
-            # Open water
-    FirstTask = GpioAction.OpenWater()
-            # We will water for 30 min every time 60*30=1800 seconds
-    time.sleep(1800)
-            # Closet water
-    SecondTask = GpioAction.CloseWater()
-            #ButtonWaterInput = 0
-        
+      
       
 
 def main():
@@ -371,18 +378,14 @@ def main():
     # water worker
     Worker2 = threading.Thread(target=WorkerWater, args=[])
     Worker2.start()
-    # water button worker
-    #Worker3 = threading.Thread(target=WorkerButtonWater, args=[])
-    #Worker3.start()
 
     # put in mainloop GUI and worker threads
     root.mainloop()
     Worker0.join()
     Worker1.join()
     Worker2.join()
-    #Worker3.join()
-    
-    
+
+
 #here we start the engine
 main()
  
