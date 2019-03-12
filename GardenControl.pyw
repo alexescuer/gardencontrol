@@ -149,19 +149,20 @@ class myGUI(tk.Frame):
 
 class GpioAction():
         # here we have all gpio actions and configurations, we define the pins used
+        WaterPin = 11
+        LightPin = 7
+
         def __init__(self):
             self.time = time
-            self.WaterPin = 11
-            self.LightPin = 7
 
         def OpenWater():
             # Maybe it is not the most ortodox way to control GPIO but is rock solid
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
             # We declare the pin we will use as an output
-            GPIO.setup(WaterPin,GPIO.OUT)
+            GPIO.setup(GpioAction.WaterPin,GPIO.OUT)
             # Turn relay ON
-            GPIO.output(WaterPin, GPIO.HIGH)
+            GPIO.output(GpioAction.WaterPin, GPIO.HIGH)
            
             #log
             timeStr = time.asctime()
@@ -173,12 +174,12 @@ class GpioAction():
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
             # We declare the pin we will use as an output
-            GPIO.setup(WaterPin,GPIO.OUT)
+            GPIO.setup(GpioAction.WaterPin,GPIO.OUT)
             # Turn relay OFF
-            GPIO.output(WaterPin, GPIO.LOW)
+            GPIO.output(GpioAction.WaterPin, GPIO.LOW)
             # Lets clean the output used so no voltage is transmited
             # Not sure why but this was the only method to 100% turn off the relay
-            GPIO.cleanup(WaterPin)
+            GPIO.cleanup(GpioAction.WaterPin)
             
             #log
             timeStr = time.asctime()
@@ -190,9 +191,9 @@ class GpioAction():
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
             # We declare the pin we will use as an output
-            GPIO.setup(WaterPin,GPIO.OUT)
+            GPIO.setup(GpioAction.WaterPin,GPIO.OUT)
             # Turn relay ON
-            GPIO.output(WaterPin, GPIO.HIGH)
+            GPIO.output(GpioAction.WaterPin, GPIO.HIGH)
 
             #log
             timeStr = time.asctime()
@@ -203,10 +204,10 @@ class GpioAction():
             time.sleep(1800)
 
             # Turn relay OFF
-            GPIO.output(WaterPin, GPIO.LOW)
+            GPIO.output(GpioAction.WaterPin, GPIO.LOW)
             # Lets clean the output used so no voltage is transmited
             # Not sure why but this was the only method to 100% turn off the relay
-            GPIO.cleanup(WaterPin)
+            GPIO.cleanup(GpioAction.WaterPin)
 
             
         def LigthsOn():
@@ -214,9 +215,9 @@ class GpioAction():
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
             # We declare the pin we will use as an output
-            GPIO.setup(LightPin,GPIO.OUT)
+            GPIO.setup(GpioAction.LightPin,GPIO.OUT)
             # Turn relay ON
-            GPIO.output(LightPin, GPIO.HIGH)
+            GPIO.output(GpioAction.LightPin, GPIO.HIGH)
           
             #log
             timeStr = time.asctime()
@@ -228,12 +229,12 @@ class GpioAction():
             # First we define that GPIO will be using BOARD pin numbers
             GPIO.setmode(GPIO.BOARD)
             # We declare the pin we will use as an output
-            GPIO.setup(LightPin,GPIO.OUT)
+            GPIO.setup(GpioAction.LightPin,GPIO.OUT)
             # Turn relay OFF
-            GPIO.output(LightPin, GPIO.LOW)
+            GPIO.output(GpioAction.LightPin, GPIO.LOW)
             # Lets clean the output used so no voltage is transmited
             # Not sure why but this was the only method to 100% turn off the relay
-            GPIO.cleanup(LightPin)
+            GPIO.cleanup(GpioAction.LightPin)
 
             #log
             timeStr = time.asctime()
