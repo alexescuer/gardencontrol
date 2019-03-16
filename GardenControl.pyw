@@ -293,7 +293,7 @@ class API():
             # we make sure minutes are also an int
             minutesint = int(minutes)
             # we return a list value
-            return SunsetTime = [hoursint, minutesint]
+            return [hoursint, minutesint]
           
 # Now we define the diferent threads that we will use.
 
@@ -322,12 +322,6 @@ def WorkerLigths():
         # we will sleep until the time to switch on the ligths
         # lets call the global variable with the sunset time and pass it to the sleeping class
         SunsetTime = API.Conection()
-
-        # we log this info
-        timeStr = time.asctime()
-        msg = timeStr + ' - API Conected successfully. Sunset: ' + SunsetTime
-        logging.info(msg)
-
         FirstTask = Sleeping.FixedSleep(SunsetTime[0],SunsetTime[1])
 
         #Lights On please!
