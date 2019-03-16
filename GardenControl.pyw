@@ -268,12 +268,6 @@ class Sleeping():
             DaysToSleep = Days * 86400
             time.sleep(DaysToSleep)
             
-# Here we create the global variable that will store the sunset time.
-# By default we will use the value 20,00. we will store hours and minutes separated by coma in the same variable
-# This is done because the Sleeping class needs hours and minutes separetly to calculate the time
-global SunsetTime
-SunsetTime = (20,00)
-
 class API():
             # This is the class that conects to the API that gives us the sunset time everyday
         def __init__(self, ConectionTime):
@@ -298,34 +292,21 @@ class API():
             hoursint = int(hours) + 12
             # we make sure minutes are also an int
             minutesint = int(minutes)
-            # we log this info
-            timeStr = time.asctime()
-            msg = timeStr + ' - API Conected successfully. Sunset: ' + sunset
-            logging.info(msg)
-            # we fill the global variable
-            global SunsetTime
-            SunsetTime = [hoursint, minutesint]
-            # just to make sure the task will not run again
-            time.sleep(60)
-
-            
-# Now we define the three diferent threads that we will use.
-# One is for the water, another for the lights, and a last one for acquiring the sunset time.
+            # we return a list value
+            return SunsetTime = [hoursint, minutesint]
+          
+# Now we define the diferent threads that we will use.
 
 def WorkerWater():
     # This is the thread that will take care of the water
-    # On start up we need to wait 10 seconds until the API has obtained the
-    # sunset value. This way we make sure the first run is done at the correct time
-    time.sleep(10) 
     # We request de global variable that stores the data input from user. Default will be 2 days
     global WaterDays
-    # We request also the global variable with the sunset time because we will water on sunset
-    global SunsetTime
     while True:
         # here we will loop the open water and close water tasks.
         # This is the "adjustment" sleep.
         # we use this to be sure that we will always open water at sunset
         # lets request to the API the sunset time and pass it  to the sleeping class
+        SunsetTime = API.Conection()
         FirstTask = Sleeping.FixedSleep(SunsetTime[0],SunsetTime[1])
         
         # water please!
@@ -337,15 +318,16 @@ def WorkerWater():
         
 def WorkerLigths():
     # This is the thread for the lights
-    # On start up we need to wait 10 seconds until the API has obtained the
-    # sunset value. This way we make sure the first run is done at the correct time
-    time.sleep(10)
-    # We request the sunset time via the global variable
-    global SunsetTime
     while True:
-
         # we will sleep until the time to switch on the ligths
         # lets call the global variable with the sunset time and pass it to the sleeping class
+        SunsetTime = API.Conection()
+
+        # we log this info
+        timeStr = time.asctime()
+        msg = timeStr + ' - API Conected successfully. Sunset: ' + SunsetTime
+        logging.info(msg)
+
         FirstTask = Sleeping.FixedSleep(SunsetTime[0],SunsetTime[1])
 
         #Lights On please!
@@ -355,20 +337,7 @@ def WorkerLigths():
         ThirdTask = Sleeping.FixedSleep(23,00)
 
         #Lights Off please!
-        FourthTask = GpioAction.LigthsOff()
-
-
-def WorkerApiSunset():
-    # This thread will daily update de sunset time value
-    while True:
-        # Invoque global variable
-        global SunsetTime
-        # Request API amd fill global variable
-        SunsetTime = API.Conection()
-        # Exectute daily at 2.00
-        FirstTask = Sleeping.FixedSleep(2,0)
-      
-      
+        FourthTask = GpioAction.LigthsOff()  
 
 def main():
       
@@ -377,9 +346,6 @@ def main():
     myGUI(root)
         
     # start the threads that execute the workers
-    # api sunset worker
-    Worker0 = threading.Thread(target=WorkerApiSunset, args=[])
-    Worker0.start()
     # lights worker
     Worker1 = threading.Thread(target=WorkerLigths, args=[])
     Worker1.start()
@@ -389,7 +355,6 @@ def main():
 
     # put in mainloop GUI and worker threads
     root.mainloop()
-    Worker0.join()
     Worker1.join()
     Worker2.join()
 
