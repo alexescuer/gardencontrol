@@ -290,10 +290,12 @@ class API():
             hours, minutes, seconds = sunset.split(":")
             # we add 12 to have a 24h format not 12h and we make sure it is an int
             hoursint = int(hours) + 12
+            # we add one hour because sunset is one hour before dark
+            hoursintplus = hoursint + 1
             # we make sure minutes are also an int
             minutesint = int(minutes)
             # we return a list value
-            return [hoursint, minutesint]
+            return [hoursintplus, minutesint]
           
 # Now we define the diferent threads that we will use.
 
