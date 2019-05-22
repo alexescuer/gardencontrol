@@ -1,5 +1,6 @@
 # GardenControl
 Simple water and lights control system. Written in python.
+It is done with oop and the idea was to keep the project as simple as possible. It is a single file.
 
 ## Hardware Required
 1) Raspberry pi
